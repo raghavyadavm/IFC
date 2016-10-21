@@ -1,5 +1,5 @@
 /**
- * 
+ * IFC generation Project
  */
 
 /**
