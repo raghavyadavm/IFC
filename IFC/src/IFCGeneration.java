@@ -28,7 +28,7 @@ public class IFCGeneration {
 	 * @param args
 	 */
 	public static void main(String[] args) throws  IOException{
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub1
 		
 		FileInputStream fis = new FileInputStream(new File("D:\\test.xlsx"));
 		XSSFWorkbook workbook = new XSSFWorkbook(fis);
