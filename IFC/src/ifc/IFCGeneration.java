@@ -40,6 +40,8 @@ public class IFCGeneration {
 	
 	public static HashMap linkMap;
 	public static HashMap analyticalLinkMap;
+	FileWriter fwg = new FileWriter(new File("D:\\interm.ifc"));
+	BufferedWriter bwg = new BufferedWriter(fwg);
 	
 	public IFCGeneration() throws IOException {
 		// TODO Auto-generated constructor stub
@@ -47,7 +49,7 @@ public class IFCGeneration {
 	//System.out.println(cc);
 		
 		printExcel();
-		linking();
+		
 		
 		
 	
@@ -55,8 +57,7 @@ public class IFCGeneration {
 	
 	public void printExcel() throws IOException{
 		XSSFRow row;
-		FileWriter fw = new FileWriter(new File("D:\\interm.ifc"));
-		BufferedWriter bw = new BufferedWriter(fw);
+		
 		
 		FileInputStream fis = new FileInputStream(new File("D:\\result.xlsx"));
 		XSSFWorkbook workbook = new XSSFWorkbook(fis);
@@ -72,8 +73,8 @@ public class IFCGeneration {
 			String zone = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone',$,IFCTEXT('"+spreadSheet.getSheetName()+"'),$);";
 			
 			System.out.println(zone);
-			bw.write(zone);
-			bw.newLine();
+			bwg.write(zone);
+			bwg.newLine();
 			
 			if (rowIterator.hasNext()) {
 				
@@ -85,25 +86,26 @@ public class IFCGeneration {
 					Cell cell = (Cell) cellIterator.next();
 					//System.out.println(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex()));
 					//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('"+(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue()+"'),$);");
-					String msg = "#"+counter+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('0'),$);";
-					bw.write(msg);
-					bw.newLine();
+					String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('0'),$);";
+					bwg.write(msg);
+					bwg.newLine();
 				}
 				
 			}
 			linkMap = Mapping.linkGeneration();
 			
-			int setCounter = ++counter;
-			analyticalMap.put( "#"+setCounter,spreadSheet.getSheetName());
-			String set = "#"+(setCounter)+"= IFCPROPERTYSET('',#Value,'Analytical Data',$,(";
+			//int setCounter = ++counter;
+			
+			String set = "#"+(++counter)+"= IFCPROPERTYSET('',#Value,'Analytical Data',$,(";
+			analyticalMap.put( "#"+counter,spreadSheet.getSheetName());
 			for (int j = counter-cellCount-1; j < counter-1; ++j) {
 				set = set+"#"+j+"," ;
 			}
 			set = set+"#"+(counter-1)+"));";
 			System.out.println(set);
 			
-			bw.write(set);
-			bw.newLine();
+			bwg.write(set);
+			bwg.newLine();
 		}	
 		
 		Set<String> analyticalMapSet = analyticalMap.keySet();
@@ -129,10 +131,15 @@ public class IFCGeneration {
 		}
 
 		
-		
-		bw.close();	
+		//linking();
+		bwg.write("ENDSEC;");
+		bwg.newLine();
+		bwg.write("END-ISO-10303-21;");
+		bwg.newLine();
+		bwg.close();	
 		workbook.close();
 		fis.close();
+		linking();
 
 	}
 	
@@ -149,7 +156,10 @@ public class IFCGeneration {
 		String line;
 		while((line = br.readLine()) != null)
 		{
-			
+			if ( (!line.contains("ENDSEC;")) && (!line.contains("END-ISO-10303-21;")) ){
+				bwg.write(line);
+				bwg.newLine();
+			}
 			if (line.contains("#")) {
 				//System.out.println("true");
 			
@@ -173,18 +183,19 @@ public class IFCGeneration {
 
 
 	public void linking() throws IOException{
-		FileReader frl = new FileReader(new File("D:\\test.ifc"));
+		FileReader frl = new FileReader(new File("D:\\interm.ifc"));
 		BufferedReader brl = new BufferedReader(frl);
 		
-		FileWriter fw = new FileWriter(new File("D:\\generated.ifc"));
-		BufferedWriter bw = new BufferedWriter(fw);
+		FileWriter fwg = new FileWriter(new File("D:\\generated.ifc"));
+		BufferedWriter bwg = new BufferedWriter(fwg);
 		
 		
 		String line;
 		while ((line = brl.readLine()) != null) {
-			// System.out.println(line);
+			
+			
 			Set<String> analyticalLinkMapSet = analyticalLinkMap.keySet();
-			System.out.println("\nlink Map");
+			//System.out.println("\nlink Map");
 			for (String str1 : analyticalLinkMapSet) {
 				//System.out.println(str1 + ":" + linkMap.get(str1) + ", ");
 				if(line.startsWith(analyticalLinkMap.get(str1)+"=")){
@@ -193,22 +204,23 @@ public class IFCGeneration {
 					StringBuilder sb = new StringBuilder(line);
 					sb.insert((line.indexOf("$,("))+3, str1+",");
 					
-					System.out.println("****line***\n"+sb);
+					//System.out.println("****line***\n"+sb);
+					//bwg.write(sb.toString());
+					//bwg.newLine();
 					
-					Path path = Paths.get("D:\\test.ifc");
-					Charset charset = StandardCharsets.UTF_8;
-
-					String content = new String(Files.readAllBytes(path), charset);
-					content = content.replace(line, sb);
-					Files.write(path, content.getBytes(charset));
+					line = sb.toString();
+					System.out.println("****replace line***\n"+line);
+					
 				}
 			}
+			//System.out.println("line"+line);
+			bwg.write(line);
+			bwg.newLine();
 			
 			
 		}
 		
-		
-		
+		bwg.close();		
 		
 	}
 	
