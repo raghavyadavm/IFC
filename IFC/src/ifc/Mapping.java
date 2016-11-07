@@ -1,3 +1,4 @@
+package ifc;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,10 +10,10 @@ import java.util.List;
 import java.util.Set;
 
 public class Mapping {
-
-	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-
+	
+	
+	public static HashMap linkGeneration() throws IOException{
+		
 		FileReader fr = new FileReader(new File("D:\\generated.ifc"));
 		BufferedReader br = new BufferedReader(fr);
 
@@ -36,11 +37,14 @@ public class Mapping {
 				for (String s : buildingProxyType.split(",")) {
 
 					ifcRelAssocaitesList.add("#"+s.substring(1));
+					associatesMaterialMap.put("#"+s.substring(1), indexOfAssociateMaterial);
 
 				}
 				for (String string : ifcRelAssocaitesList) {
-					// System.out.println(string);
+					
 				}
+				
+				
 			}
 
 			if (line.contains("IFCBUILDINGELEMENTPROXYTYPE") && line.contains("Size 2 - 12 inch Inlet")) {
@@ -52,10 +56,13 @@ public class Mapping {
 				for (String s : sets.split(",")) {
 
 					buildingProxyTypeList.add("#"+s.substring(1));
+					buildingProxyTypeMap.put("#"+s.substring(1),proxyType);
 
 				}
+				
+				
 
-				buildingProxyTypeMap.put(proxyType, buildingProxyTypeList);
+				
 
 			}
 
@@ -72,7 +79,11 @@ public class Mapping {
 				}
 
 				if (propertySetList.size() > 10) {
-					propertySetMap.put(propertySetIndex, propertySetList);
+					for (String string : propertySetList) {
+						//System.out.println(string);
+						propertySetMap.put(string,propertySetIndex);
+					}
+					
 				}
 
 			}
@@ -83,14 +94,14 @@ public class Mapping {
 				//System.out.println("proxyType " + BEMSIndex);
 				//System.out.println("sets " + BEMSValue);
 
-				bemsMap.put(BEMSIndex, BEMSValue);
+				bemsMap.put(BEMSValue, BEMSIndex);
 
 			}
 
 		}
 
-		associatesMaterialMap.put(indexOfAssociateMaterial, ifcRelAssocaitesList);
-		Set<String> mySet1 = associatesMaterialMap.keySet();
+		
+		/*Set<String> mySet1 = associatesMaterialMap.keySet();
 		System.out.println("AssociateMaterial ");
 		for (String str : mySet1) {
 			System.out.println(str + ":" + associatesMaterialMap.get(str) + ", ");
@@ -112,10 +123,41 @@ public class Mapping {
 		System.out.println("\nBEMS Identity data");
 		for (String str1 : mySet4) {
 			System.out.println(str1 + ":" + bemsMap.get(str1) + ", ");
+		}*/
+		
+		
+		
+		Set<String> bemsMapRetrieve = bemsMap.keySet();
+		Set<String> propertySetMapRetrieve = propertySetMap.keySet();
+		Set<String> buildingProxyTypeMapRetrieve = buildingProxyTypeMap.keySet();
+		Set<String> associatesMaterialMapRetrieve = associatesMaterialMap.keySet();
+		
+		HashMap linkMap =new  HashMap();
+		System.out.println("\nBEMS Identity data");
+		for (String level1 : bemsMapRetrieve) {
+			
+				String gen=	(String) buildingProxyTypeMap.get(propertySetMap.get(bemsMap.get(level1)));
+				//System.out.println(gen);
+			linkMap.put(level1, gen);
+		}
+		
+		System.out.println(linkMap);
+		
+		Set<String> linkMapSet = linkMap.keySet();
+		System.out.println("\nlink Map");
+		for (String str1 : linkMapSet) {
+			System.out.println(str1 + ":" + linkMap.get(str1) + ", ");
 		}
 
 		br.close();
-
+		
+		
+		
+		
+		return linkMap;
+		
 	}
 
+	
+	
 }

@@ -1,4 +1,6 @@
+package ifc;
 import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +16,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import ifc.Mapping;
 
 
 
@@ -33,6 +37,8 @@ public class IFCGeneration {
 	//System.out.println(cc);
 		
 		printExcel();
+		
+		
 	
 	}
 	
@@ -133,6 +139,7 @@ public class IFCGeneration {
 		// TODO Auto-generated method stub1
 		
 		new IFCGeneration();
+		System.out.println("Mapping"+Mapping.linkGeneration());
 		
 	}
 
