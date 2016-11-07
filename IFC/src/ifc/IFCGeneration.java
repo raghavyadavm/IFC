@@ -8,7 +8,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -31,12 +38,16 @@ import ifc.Mapping;
  */
 public class IFCGeneration {
 	
+	public static HashMap linkMap;
+	public static HashMap analyticalLinkMap;
+	
 	public IFCGeneration() throws IOException {
 		// TODO Auto-generated constructor stub
 	//int cc = getCount();
 	//System.out.println(cc);
 		
 		printExcel();
+		linking();
 		
 		
 	
@@ -44,15 +55,17 @@ public class IFCGeneration {
 	
 	public void printExcel() throws IOException{
 		XSSFRow row;
-		FileWriter fw = new FileWriter(new File("D:\\test3.ifc"));
+		FileWriter fw = new FileWriter(new File("D:\\interm.ifc"));
 		BufferedWriter bw = new BufferedWriter(fw);
 		
-		FileInputStream fis = new FileInputStream(new File("D:\\test2.xlsx"));
+		FileInputStream fis = new FileInputStream(new File("D:\\result.xlsx"));
 		XSSFWorkbook workbook = new XSSFWorkbook(fis);
+		
+		HashMap analyticalMap = new HashMap();
 		int cellCount = 0;
 		int counter = getCount();
 		
-		for (int i = 1; i <5; i++) {
+		for (int i = 1; i <workbook.getNumberOfSheets(); i++) {
 			
 			XSSFSheet spreadSheet = workbook.getSheetAt(i);
 			Iterator<Row> rowIterator = spreadSheet.iterator();
@@ -71,15 +84,18 @@ public class IFCGeneration {
 					
 					Cell cell = (Cell) cellIterator.next();
 					//System.out.println(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex()));
-					System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('"+(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue()+"'),$);");
-					String msg = "#"+counter+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('"+(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue()+"'),$);";
+					//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('"+(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue()+"'),$);");
+					String msg = "#"+counter+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('0'),$);";
 					bw.write(msg);
 					bw.newLine();
 				}
 				
 			}
+			linkMap = Mapping.linkGeneration();
 			
-			String set = "#"+(++counter)+"= IFCPROPERTYSET('',#Value,'Analytical Data',$,(";
+			int setCounter = ++counter;
+			analyticalMap.put( "#"+setCounter,spreadSheet.getSheetName());
+			String set = "#"+(setCounter)+"= IFCPROPERTYSET('',#Value,'Analytical Data',$,(";
 			for (int j = counter-cellCount-1; j < counter-1; ++j) {
 				set = set+"#"+j+"," ;
 			}
@@ -89,6 +105,30 @@ public class IFCGeneration {
 			bw.write(set);
 			bw.newLine();
 		}	
+		
+		Set<String> analyticalMapSet = analyticalMap.keySet();
+		System.out.println("\nanalyticalMap");
+		for (String str1 : analyticalMapSet) {
+			System.out.println(str1 + ":" + analyticalMap.get(str1) + ", ");
+		}
+		
+		Set<String> analyticalMapRetrieve = analyticalMap.keySet();
+		analyticalLinkMap =new  HashMap();
+		//System.out.println("\nBEMS Identity data");
+		for (String level1 : analyticalMapRetrieve) {
+			
+				String gen=	(String) linkMap.get(analyticalMap.get(level1));
+				//System.out.println(gen);
+				analyticalLinkMap.put(level1, gen);
+		}
+		
+		Set<String> analyticalLinkMapSet = analyticalLinkMap.keySet();
+		System.out.println("\nAnalytical link Map");
+		for (String str1 : analyticalLinkMapSet) {
+			System.out.println(str1 + ":" + analyticalLinkMap.get(str1) + ", ");
+		}
+
+		
 		
 		bw.close();	
 		workbook.close();
@@ -132,6 +172,48 @@ public class IFCGeneration {
 	}
 
 
+	public void linking() throws IOException{
+		FileReader frl = new FileReader(new File("D:\\test.ifc"));
+		BufferedReader brl = new BufferedReader(frl);
+		
+		FileWriter fw = new FileWriter(new File("D:\\generated.ifc"));
+		BufferedWriter bw = new BufferedWriter(fw);
+		
+		
+		String line;
+		while ((line = brl.readLine()) != null) {
+			// System.out.println(line);
+			Set<String> analyticalLinkMapSet = analyticalLinkMap.keySet();
+			System.out.println("\nlink Map");
+			for (String str1 : analyticalLinkMapSet) {
+				//System.out.println(str1 + ":" + linkMap.get(str1) + ", ");
+				if(line.startsWith(analyticalLinkMap.get(str1)+"=")){
+					System.out.println("****line***\n"+line);
+					//line = line.substring(0,(line.indexOf("$,("))+3)+"#18865"+","+line.substring(line.indexOf("$,(")+,line.length());
+					StringBuilder sb = new StringBuilder(line);
+					sb.insert((line.indexOf("$,("))+3, str1+",");
+					
+					System.out.println("****line***\n"+sb);
+					
+					Path path = Paths.get("D:\\test.ifc");
+					Charset charset = StandardCharsets.UTF_8;
+
+					String content = new String(Files.readAllBytes(path), charset);
+					content = content.replace(line, sb);
+					Files.write(path, content.getBytes(charset));
+				}
+			}
+			
+			
+		}
+		
+		
+		
+		
+	}
+	
+	
+	
 	/**
 	 * @param args
 	 */

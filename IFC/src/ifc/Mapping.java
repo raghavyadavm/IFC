@@ -14,7 +14,7 @@ public class Mapping {
 	
 	public static HashMap linkGeneration() throws IOException{
 		
-		FileReader fr = new FileReader(new File("D:\\generated.ifc"));
+		FileReader fr = new FileReader(new File("D:\\test.ifc"));
 		BufferedReader br = new BufferedReader(fr);
 
 		HashMap associatesMaterialMap = new HashMap();
@@ -128,12 +128,10 @@ public class Mapping {
 		
 		
 		Set<String> bemsMapRetrieve = bemsMap.keySet();
-		Set<String> propertySetMapRetrieve = propertySetMap.keySet();
-		Set<String> buildingProxyTypeMapRetrieve = buildingProxyTypeMap.keySet();
-		Set<String> associatesMaterialMapRetrieve = associatesMaterialMap.keySet();
+		
 		
 		HashMap linkMap =new  HashMap();
-		System.out.println("\nBEMS Identity data");
+		//System.out.println("\nBEMS Identity data");
 		for (String level1 : bemsMapRetrieve) {
 			
 				String gen=	(String) buildingProxyTypeMap.get(propertySetMap.get(bemsMap.get(level1)));
@@ -141,7 +139,7 @@ public class Mapping {
 			linkMap.put(level1, gen);
 		}
 		
-		System.out.println(linkMap);
+		//System.out.println(linkMap);
 		
 		Set<String> linkMapSet = linkMap.keySet();
 		System.out.println("\nlink Map");
