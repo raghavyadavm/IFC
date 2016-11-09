@@ -38,6 +38,7 @@ import ifc.Mapping;
  */
 public class IFCGeneration {
 	
+	@SuppressWarnings("rawtypes")
 	public static HashMap linkMap;
 	public static HashMap analyticalLinkMap;
 	FileWriter fwg = new FileWriter(new File("D:\\interm.ifc"));
@@ -48,8 +49,9 @@ public class IFCGeneration {
 	//int cc = getCount();
 	//System.out.println(cc);
 		
-		printExcel();
+		//printExcel();
 		
+		Mapping.linkGeneration();
 		
 		
 	
@@ -72,7 +74,7 @@ public class IFCGeneration {
 			Iterator<Row> rowIterator = spreadSheet.iterator();
 			String zone = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone',$,IFCTEXT('"+spreadSheet.getSheetName()+"'),$);";
 			
-			System.out.println(zone);
+			//System.out.println(zone);
 			bwg.write(zone);
 			bwg.newLine();
 			
@@ -102,7 +104,7 @@ public class IFCGeneration {
 				set = set+"#"+j+"," ;
 			}
 			set = set+"#"+(counter-1)+"));";
-			System.out.println(set);
+			//System.out.println(set);
 			
 			bwg.write(set);
 			bwg.newLine();
@@ -174,7 +176,7 @@ public class IFCGeneration {
 		}
 		
 		//System.out.println(ts1);
-		System.out.println(ts1.last());
+		//System.out.println(ts1.last());
 		br.close();
 		bw.close();
 		return ts1.last();
@@ -199,7 +201,7 @@ public class IFCGeneration {
 			for (String str1 : analyticalLinkMapSet) {
 				//System.out.println(str1 + ":" + linkMap.get(str1) + ", ");
 				if(line.startsWith(analyticalLinkMap.get(str1)+"=")){
-					System.out.println("****line***\n"+line);
+					//System.out.println("****line***\n"+line);
 					//line = line.substring(0,(line.indexOf("$,("))+3)+"#18865"+","+line.substring(line.indexOf("$,(")+,line.length());
 					StringBuilder sb = new StringBuilder(line);
 					sb.insert((line.indexOf("$,("))+3, str1+",");
@@ -209,7 +211,7 @@ public class IFCGeneration {
 					//bwg.newLine();
 					
 					line = sb.toString();
-					System.out.println("****replace line***\n"+line);
+					//System.out.println("****replace line***\n"+line);
 					
 				}
 			}
@@ -233,7 +235,7 @@ public class IFCGeneration {
 		// TODO Auto-generated method stub1
 		
 		new IFCGeneration();
-		System.out.println("Mapping"+Mapping.linkGeneration());
+		//System.out.println("Mapping"+Mapping.linkGeneration());
 		
 	}
 

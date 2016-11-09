@@ -12,6 +12,7 @@ import java.util.Set;
 public class Mapping {
 	
 	
+	@SuppressWarnings("rawtypes")
 	public static HashMap linkGeneration() throws IOException{
 		
 		FileReader fr = new FileReader(new File("D:\\test.ifc"));
@@ -101,29 +102,29 @@ public class Mapping {
 		}
 
 		
-		/*Set<String> mySet1 = associatesMaterialMap.keySet();
-		System.out.println("AssociateMaterial ");
+		Set<String> mySet1 = associatesMaterialMap.keySet();
+		System.out.println("IFCRELAssociatesMaterial Map");
 		for (String str : mySet1) {
 			System.out.println(str + ":" + associatesMaterialMap.get(str) + ", ");
 		}
 
 		Set<String> mySet2 = buildingProxyTypeMap.keySet();
-		System.out.println("\nProxyTypeList");
+		System.out.println("\nIFCBUILDINGELEMENTProxyType Map");
 		for (String str1 : mySet2) {
 			System.out.println(str1 + ":" + buildingProxyTypeMap.get(str1) + ", ");
 		}
 
 		Set<String> mySet3 = propertySetMap.keySet();
-		System.out.println("\npropertySet");
+		System.out.println("\nIFCPropertSet(Dimensions) Map");
 		for (String str1 : mySet3) {
 			System.out.println(str1 + ":" + propertySetMap.get(str1) + ", ");
 		}
 
 		Set<String> mySet4 = bemsMap.keySet();
-		System.out.println("\nBEMS Identity data");
+		System.out.println("\nBEMS Identity Data Map");
 		for (String str1 : mySet4) {
 			System.out.println(str1 + ":" + bemsMap.get(str1) + ", ");
-		}*/
+		}
 		
 		
 		
