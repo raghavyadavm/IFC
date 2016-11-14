@@ -102,7 +102,7 @@ public class Mapping {
 		}
 
 		
-		Set<String> mySet1 = associatesMaterialMap.keySet();
+		/*Set<String> mySet1 = associatesMaterialMap.keySet();
 		System.out.println("IFCRELAssociatesMaterial Map");
 		for (String str : mySet1) {
 			System.out.println(str + ":" + associatesMaterialMap.get(str) + ", ");
@@ -124,7 +124,7 @@ public class Mapping {
 		System.out.println("\nBEMS Identity Data Map");
 		for (String str1 : mySet4) {
 			System.out.println(str1 + ":" + bemsMap.get(str1) + ", ");
-		}
+		}*/
 		
 		
 		
