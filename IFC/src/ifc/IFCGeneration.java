@@ -118,7 +118,7 @@ public class IFCGeneration {
 		
 		Set<String> analyticalMapRetrieve = analyticalMap.keySet();
 		analyticalLinkMap =new  HashMap();
-		//System.out.println("\nBEMS Identity data");
+		
 		for (String level1 : analyticalMapRetrieve) {
 			
 				String gen=	(String) linkMap.get(analyticalMap.get(level1));
@@ -163,10 +163,10 @@ public class IFCGeneration {
 				bwg.newLine();
 			}
 			if (line.contains("#")) {
-				//System.out.println("true");
+				
 			
 				String requiredString = line.substring(line.indexOf("#") + 1, line.indexOf("="));
-				//System.out.println(requiredString);
+				
 				int num = Integer.parseInt(requiredString);
 				ts1.add(num);
 				bw.write(String.valueOf(num));
@@ -175,8 +175,7 @@ public class IFCGeneration {
 			
 		}
 		
-		//System.out.println(ts1);
-		//System.out.println(ts1.last());
+		
 		br.close();
 		bw.close();
 		return ts1.last();
