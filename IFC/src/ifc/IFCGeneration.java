@@ -49,9 +49,9 @@ public class IFCGeneration {
 	//int cc = getCount();
 	//System.out.println(cc);
 		
-		//printExcel();
+		printExcel();
 		
-		Mapping.linkGeneration();
+		//Mapping.linkGeneration();
 		
 		
 	
@@ -68,33 +68,72 @@ public class IFCGeneration {
 		int cellCount = 0;
 		int counter = getCount();
 		
-		for (int i = 1; i <workbook.getNumberOfSheets(); i++) {
+		for (int i = 2; i <3; i++) {
 			
 			XSSFSheet spreadSheet = workbook.getSheetAt(i);
 			Iterator<Row> rowIterator = spreadSheet.iterator();
 			String zone = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone',$,IFCTEXT('"+spreadSheet.getSheetName()+"'),$);";
 			
-			//System.out.println(zone);
+			System.out.println(zone);
 			bwg.write(zone);
 			bwg.newLine();
 			
 			if (rowIterator.hasNext()) {
 				
 				row = (XSSFRow) rowIterator.next();
-				cellCount= row.getLastCellNum();
+				cellCount= 6; // No of single values
 				Iterator<Cell> cellIterator = row.cellIterator();
+				
 				while (cellIterator.hasNext()) {
 					
 					Cell cell = (Cell) cellIterator.next();
-					//System.out.println(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex()));
-					//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('"+(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue()+"'),$);");
-					String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('0'),$);";
-					bwg.write(msg);
-					bwg.newLine();
+					int cellIndex = cell.getColumnIndex();
+					
+					if(cellIndex ==0){
+						System.out.println(cell.getColumnIndex());
+					
+						//System.out.println(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex()));
+						//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('"+(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue()+"'),$);");
+						String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('0'),$);";
+						System.out.println(msg);
+						bwg.write(msg);
+						bwg.newLine();
+					}
+					if(cellIndex ==2){
+						System.out.println(cell.getColumnIndex());
+						String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+" A"+"',$,IFCTEXT('0'),$);";
+						System.out.println(msg);
+						bwg.write(msg);
+						bwg.newLine();
+					}
+					if(cellIndex ==14){
+						System.out.println(cell.getColumnIndex());
+						String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+" B"+"',$,IFCTEXT('0'),$);";
+						System.out.println(msg);
+						bwg.write(msg);
+						bwg.newLine();
+					}
+					if(cellIndex ==24){
+						System.out.println(cell.getColumnIndex());
+						String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('0'),$);";
+						System.out.println(msg);
+						bwg.write(msg);
+						bwg.newLine();
+					}
+					
 				}
+				String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('A Difference',$,IFCTEXT('0'),$);";
+				System.out.println(msg);
+				bwg.write(msg);
+				bwg.newLine();
+				
+				String msg1 = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('B Difference',$,IFCTEXT('0'),$);";
+				System.out.println(msg1);
+				bwg.write(msg1);
+				bwg.newLine();
 				
 			}
-			linkMap = Mapping.linkGeneration();
+			//linkMap = Mapping.linkGeneration();
 			
 			//int setCounter = ++counter;
 			
@@ -104,13 +143,13 @@ public class IFCGeneration {
 				set = set+"#"+j+"," ;
 			}
 			set = set+"#"+(counter-1)+"));";
-			//System.out.println(set);
+			System.out.println(set);
 			
 			bwg.write(set);
 			bwg.newLine();
 		}	
 		
-		Set<String> analyticalMapSet = analyticalMap.keySet();
+		/*Set<String> analyticalMapSet = analyticalMap.keySet();
 		System.out.println("\nanalyticalMap");
 		for (String str1 : analyticalMapSet) {
 			System.out.println(str1 + ":" + analyticalMap.get(str1) + ", ");
@@ -130,7 +169,7 @@ public class IFCGeneration {
 		System.out.println("\nAnalytical link Map");
 		for (String str1 : analyticalLinkMapSet) {
 			System.out.println(str1 + ":" + analyticalLinkMap.get(str1) + ", ");
-		}
+		}*/
 
 		
 		//linking();
@@ -141,7 +180,7 @@ public class IFCGeneration {
 		bwg.close();	
 		workbook.close();
 		fis.close();
-		linking();
+		//linking();
 
 	}
 	
