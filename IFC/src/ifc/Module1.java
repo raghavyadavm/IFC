@@ -1,4 +1,5 @@
-package BEMS_BIM_API;
+package ifc;
+
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,7 +23,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
 
-public class Phase1 {
+public class Module1 {
 	public static String bems_file;
 	public static String CMMS_file;
 	public static String ifc_file;
@@ -181,8 +182,9 @@ public class Phase1 {
 	}
 
 	public static void main(String a[]) throws IOException{
-		new Phase1().process_bems_file();
-		new Phase1().phase_1();
-		new Phase1().phase_2();
+		new Module1().process_bems_file();
+		new Module1().phase_1();
+		new Module1().phase_2();
 	}
 }	
+
