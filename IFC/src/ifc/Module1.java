@@ -38,6 +38,7 @@ public class Module1 {
 	public static HashMap<String, Integer> identity_lineno_row_map = new HashMap<String, Integer>();
 
 	/*
+<<<<<<< HEAD
 	 * STEP 0: Proces BEMS File
 	 * */
 	public void process_bems_file() throws IOException
@@ -381,6 +382,151 @@ public class Module1 {
 		writer.close();
 		//MessageBox.Show("Done processing!");
 	}
+=======
+	 * STEP 0: Process BEMS File
+	 * */
+	public void process_bems_file() throws IOException
+	{
+		XSSFRow row;	
+		
+		
+		FileInputStream fis = new FileInputStream(new File("D:\\BEMS.xlsx"));
+		XSSFWorkbook workbook = new XSSFWorkbook(fis);
+		XSSFSheet spreadSheet = workbook.getSheetAt(0);
+		
+		Iterator<Row> rowIterator = spreadSheet.iterator();
+		
+		String newValue = null;
+		
+		while (rowIterator.hasNext()) {
+			
+			row = (XSSFRow) rowIterator.next();			
+			Iterator<Cell> cellIterator = row.cellIterator();			
+			
+			while (cellIterator.hasNext()) {
+				String value = "";				
+				Cell cell = (Cell) cellIterator.next();
+				
+				int columnIndex = cell.getColumnIndex();
+				int rowIndex = cell.getRowIndex();
+				
+				if (columnIndex % 2 != 0) {
+					//System.out.println(cell.getStringCellValue());
+					newValue = cell.getStringCellValue();
+					
+					if (rowIndex == 0) {
+						
+						//System.out.println("Header "+ cell.getStringCellValue());
+						bemsHeader.put(columnIndex, cell.getStringCellValue());
+					}
+					
+					if (newValue != null)
+					{
+						value = newValue;
+					}
+					
+					if (value.toLowerCase().contains("alarm"))
+					{
+						System.out.println("***alarm***");
+						System.out.println(columnIndex);
+						String sb = bemsHeader.get(columnIndex);
+						sb = sb.substring(sb.indexOf(".")+1);
+						System.out.println(sb);
+						objectIDs.add(sb);
+					} 	
+				}
+				
+			}			
+		}
+	}
+
+	private void phase_1() throws IOException
+	{
+		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
+		BufferedReader br = new BufferedReader(fr);
+		
+		String line = "";
+		int hits = 0;
+		
+		
+		
+		while ((line = br.readLine()) != null)
+		{
+			for (String objectid : objectIDs)
+			{
+				if (line.contains("IFCPROPERTYSINGLEVALUE") && line.contains("BEMS ID") && line.contains(objectid)) {
+					
+					System.out.println(line);
+					String lineNo = line.substring(1, line.indexOf("="));
+					objectID_LineNo_Map.put(objectid, lineNo);
+					System.out.println(objectid + "\t" +  lineNo);
+					hits++;
+				}
+			}	
+			
+			if (hits == objectIDs.size())
+			{
+				break;
+			}
+			
+		}
+		br.close();
+		//MessageBox.Show("Done processing!");
+		 
+		 
+	}
+
+	private void phase_2() throws IOException
+	{
+		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
+		BufferedReader br = new BufferedReader(fr);
+		
+		//java.io.InputStreamReader reader = new java.io.InputStreamReader(ifc_file);
+		String line = "";
+		int hits = 0;
+		while ((line = br.readLine()) != null)
+		{
+			if (!line.contains("'Identity Data'"))
+			{
+				continue;
+			}
+			for (String objectid : objectIDs)
+			{
+				String lineNo = "#" + objectID_LineNo_Map.get(objectid);
+				if (line.contains(lineNo))
+				{
+					//MessageBox.Show(line);
+					System.out.println(line);
+					String identity_LineNo = line.substring(1, line.indexOf("="));
+					objectID_LineNo_Identity_Map.put(objectid, identity_LineNo);
+					// MessageBox.Show(objectid + "\t" +  identity_LineNo);
+					System.out.println(objectid + "\t" +  identity_LineNo);
+					String attributesString = line.replace("));", "");
+					attributesString = attributesString.substring(line.indexOf("(#") + 1);
+					//MessageBox.Show(attributesString);
+					System.out.println(attributesString);
+					
+
+					
+					identity_Line_No_attributes_Map.put(identity_LineNo, new ArrayList<String>(Arrays.asList(attributesString.split(","))));
+					String[] parts = attributesString.split("[,]", -1);
+					for (int i = 0; i < parts.length; i++)
+					{
+						attributes_lineNos.add(parts[i]);
+					}
+					hits++;
+				}
+			}
+			if (hits == objectIDs.size())
+			{
+				break;
+			}
+		}
+		br.close();
+		//MessageBox.Show("Done processing!");
+	}
+
+>>>>>>> branch 'ResultsDataAverages' of https://github.com/raghavyadavm/IFC.git
 	public static void main(String a[]) throws IOException{
 		new Module1().process_bems_file();
 		new Module1().phase_1();
