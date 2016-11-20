@@ -293,7 +293,7 @@ public class IFCGeneration {
 	
 	
 	public  int getCount() throws IOException{
-		FileReader fr = new FileReader(new File("D:\\test.ifc"));
+		FileReader fr = new FileReader(new File("D:\\outcome.ifc"));
 		BufferedReader br = new BufferedReader(fr);
 		
 		FileWriter fw = new FileWriter(new File("D:\\result1.ifc"));
