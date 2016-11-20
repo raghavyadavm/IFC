@@ -38,7 +38,7 @@ public class Module1 {
 	public static HashMap<String, Integer> identity_lineno_row_map = new HashMap<String, Integer>();
 
 	/*
-	 * STEP 0: Process BEMS File
+	 * STEP 0: Proces BEMS File
 	 * */
 	public void process_bems_file() throws IOException
 	{
