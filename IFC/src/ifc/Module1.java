@@ -39,7 +39,7 @@ public class Module1 {
 
 	/*
 <<<<<<< HEAD
-	 * STEP 0: Proces BEMS File
+	 * STEP 0: Process BEMS File
 	 * */
 	public void process_bems_file() throws IOException
 	{
