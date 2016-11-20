@@ -1,10 +1,10 @@
 package ifc;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,6 +23,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
 
+
 public class Module1 {
 	public static String bems_file;
 	public static String CMMS_file;
@@ -37,8 +38,15 @@ public class Module1 {
 	public static HashSet<String> attributes_lineNos = new HashSet<String>();
 	public static HashMap<String, Integer> identity_lineno_row_map = new HashMap<String, Integer>();
 
+	public Module1() throws IOException{
+		process_bems_file();
+		phase_1();
+		phase_2();
+		phase_3();
+		phase_4();
+		phase_5();
+	}
 	/*
-<<<<<<< HEAD
 	 * STEP 0: Process BEMS File
 	 * */
 	public void process_bems_file() throws IOException
@@ -84,7 +92,7 @@ public class Module1 {
 					if (value.toLowerCase().contains("alarm"))
 					{
 						System.out.println("***alarm***");
-						System.out.println(columnIndex);
+						//System.out.println(columnIndex);
 						String sb = bemsHeader.get(columnIndex);
 						sb = sb.substring(sb.indexOf(".")+1);
 						System.out.println(sb);
@@ -94,10 +102,9 @@ public class Module1 {
 				
 			}			
 		}
-		workbook.close();
 	}
 
-	private void phase_1() throws IOException
+	public void phase_1() throws IOException
 	{
 		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
 		BufferedReader br = new BufferedReader(fr);
@@ -113,10 +120,10 @@ public class Module1 {
 			{
 				if (line.contains("IFCPROPERTYSINGLEVALUE") && line.contains("BEMS ID") && line.contains(objectid)) {
 					
-					System.out.println(line);
+					//System.out.println(line);
 					String lineNo = line.substring(1, line.indexOf("="));
 					objectID_LineNo_Map.put(objectid, lineNo);
-					System.out.println(objectid + "\t" +  lineNo);
+					//System.out.println(objectid + "\t" +  lineNo);
 					hits++;
 				}
 			}	
@@ -133,7 +140,7 @@ public class Module1 {
 		 
 	}
 
-	private void phase_2() throws IOException
+	public void phase_2() throws IOException
 	{
 		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
 		BufferedReader br = new BufferedReader(fr);
@@ -153,15 +160,15 @@ public class Module1 {
 				if (line.contains(lineNo))
 				{
 					//MessageBox.Show(line);
-					System.out.println(line);
+					//System.out.println(line);
 					String identity_LineNo = line.substring(1, line.indexOf("="));
 					objectID_LineNo_Identity_Map.put(objectid, identity_LineNo);
 					// MessageBox.Show(objectid + "\t" +  identity_LineNo);
-					System.out.println(objectid + "\t" +  identity_LineNo);
+					//System.out.println(objectid + "\t" +  identity_LineNo);
 					String attributesString = line.replace("));", "");
 					attributesString = attributesString.substring(line.indexOf("(#") + 1);
 					//MessageBox.Show(attributesString);
-					System.out.println(attributesString);
+					//System.out.println(attributesString);
 					
 
 					
@@ -182,11 +189,13 @@ public class Module1 {
 		br.close();
 		//MessageBox.Show("Done processing!");
 	}
-	private void phase_3()
-	{
-		java.io.InputStreamReader reader = new java.io.InputStreamReader(ifc_file);
+
+	public void phase_3() throws IOException{
+		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
+		BufferedReader br = new BufferedReader(fr);
+		
 		String line = "";
-		while ((line = reader.ReadLine()) != null)
+		while ((line = br.readLine()) != null)
 		{
 			for (String lineno : attributes_lineNos)
 			{
@@ -202,14 +211,15 @@ public class Module1 {
 					String[] v = new String[] {key, value};
 					at_lineno_attribute_map.put(lineno, v);
 					//MessageBox.Show(key + "\t" + value);
+					//System.out.println(key + "\t" + value);
 				}
 			}
 		}
-		reader.close();
+		br.close();
 		//MessageBox.Show("Done processing!");
 	}
-
-	private void phase_4()
+	
+	public void phase_4() throws IOException
 	{
 		for (String identity_line_no : identity_Line_No_attributes_Map.keySet())
 		{
@@ -217,7 +227,7 @@ public class Module1 {
 			String sn = "";
 			for (String at_line_no : identity_Line_No_attributes_Map.get(identity_line_no))
 			{
-				if (!at_lineno_attribute_map.keySet().Contains(at_line_no))
+				if (!at_lineno_attribute_map.keySet().contains(at_line_no))
 				{
 					continue;
 				}
@@ -239,124 +249,180 @@ public class Module1 {
 			}
 			if (cmmsId.equals("") && sn.equals(""))
 			{
-				JOptionPane.showMessageDialog(null, "Problem occured. No CMMS ID or Serial Number found!");
-				return;
+				System.out.println("Problem occured. No CMMS ID or Serial Number found!");
+				
 			}
+			
+			XSSFRow row;	
+			
+			
+			FileInputStream fis = new FileInputStream(new File("D:\\CMMS.xlsx"));
+			XSSFWorkbook workbook = new XSSFWorkbook(fis);
+			XSSFSheet spreadSheet = workbook.getSheetAt(0);
+			Iterator<Row> rowIterator = spreadSheet.iterator();
+			
+	
+			
+			while (rowIterator.hasNext()) {
+				
+				row = (XSSFRow) rowIterator.next();			
+				Iterator<Cell> cellIterator = row.cellIterator();			
+				
+				while (cellIterator.hasNext()) {
+									
+					Cell cell = (Cell) cellIterator.next();
+					int type;
+				    
+				    type = cell.getCellType();
 
-			Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-			Microsoft.Office.Interop.Excel.Workbook xlWorkBook = xlApp.getWorkbooks().Open(CMMS_file, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-			Microsoft.Office.Interop.Excel.Worksheet xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.getWorksheets().get_Item(1);
-			Microsoft.Office.Interop.Excel.Range range = xlWorkSheet.getUsedRange();
-			for (int cCnt = 1; cCnt <= range.getColumns().getCount(); cCnt++)
-			{
-				for (int rCnt = 1; rCnt <= range.getRows().getCount(); rCnt++)
-				{
-					String cell_value = (String)((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, cCnt) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, cCnt) : null)).getValue2();
-					if (cmmsId.equals(cell_value) || sn.equals(cell_value))
+				    Object result;
+					switch (type) {
+
+				        case 0: // numeric value in Excel
+				            result = cell.getNumericCellValue();
+				            break;
+				        case 1: // String Value in Excel 
+				            result = cell.getStringCellValue();
+				            break;
+				        default:  
+				            throw new RuntimeException("There is no support for this type of cell");                        
+				    }
+					String value = result.toString();
+					if (cmmsId.equals(value) || sn.equals(value))
 					{
 						//MessageBox.Show(rCnt.ToString());
-						identity_lineno_row_map.put(identity_line_no, rCnt);
-						cCnt = range.getColumns().getCount();
-						rCnt = range.getRows().getCount();
+						identity_lineno_row_map.put(identity_line_no, cell.getRowIndex());
+						//System.out.println(identity_line_no+"  "+cell.getRowIndex());
+						//cCnt = range.getColumns().getCount();
+						//rCnt = range.getRows().getCount();
 					}
 				}
-			}
-			xlWorkBook.Close(true, null, null);
-			xlApp.Quit();
+			}	
+
+			System.out.println(identity_lineno_row_map);
+			workbook.close();
 		}
 		//MessageBox.Show("Done processing!");
 	}
 
-	private void phase_5()
+
+	public void phase_5() throws IOException
 	{
 		HashMap<String, String> modifications_map = new HashMap<String, String>();
-
-		Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-		Microsoft.Office.Interop.Excel.Workbook xlWorkBook = xlApp.getWorkbooks().Open(CMMS_file, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-		Microsoft.Office.Interop.Excel.Worksheet xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.getWorksheets().get_Item(1);
-		Microsoft.Office.Interop.Excel.Range range = xlWorkSheet.getUsedRange();
+		
+			
+		
+		
+		FileInputStream fis = new FileInputStream(new File("D:\\CMMS.xlsx"));
+		XSSFWorkbook workbook = new XSSFWorkbook(fis);
+		XSSFSheet spreadSheet = workbook.getSheetAt(0);
+				
 
 		for (String identity_lineno : identity_lineno_row_map.keySet())
 		{
 			int rCnt = identity_lineno_row_map.get(identity_lineno);
 			for (String attribute_lineno : identity_Line_No_attributes_Map.get(identity_lineno))
 			{
-				if (!at_lineno_attribute_map.keySet().Contains(attribute_lineno))
+				if (!at_lineno_attribute_map.keySet().contains(attribute_lineno))
 				{
 					continue;
 				}
 				String[] attribute = at_lineno_attribute_map.get(attribute_lineno);
-				switch (attribute[0])
-				{
-					case "serves":
-					{
-							//column 5
-							String cell_value = String.valueOf(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 5) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 5) : null)).getValue2());
-							modifications_map.put(attribute_lineno, cell_value);
-							break;
-					}
-					case "model number":
-					{
-							//column 8
-							String cell_value = String.valueOf(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 8) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 8) : null)).getValue2());
-							modifications_map.put(attribute_lineno, cell_value);
-							break;
-					}
-					case "Warranty date":
-					{
-							//column 11
+				switch (attribute[0]) {
+				case "serves": {
+					// column 5
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(4);
+					String cell_value = cell.getStringCellValue();
+					//System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "model number": {
+					// column 8
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(7);
+					String cell_value = cell.getStringCellValue();
+					//System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Warranty date": {
+					// column 11
 
-							double cell_value = (double)(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 11) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 11) : null)).getValue2());
-							java.time.LocalDateTime dt = java.time.LocalDateTime.FromOADate(cell_value);
-							modifications_map.put(attribute_lineno, dt.ToShortDateString());
-							break;
-					}
-					case "Previous Maintenance number":
-					{
-							//column 13
-							String cell_value = String.valueOf(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 13) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 13) : null)).getValue2());
-							modifications_map.put(attribute_lineno, cell_value);
-							break;
-					}
-					case "Previous Maintenance description":
-					{
-							//column 14
-							String cell_value = String.valueOf(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 14) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 14) : null)).getValue2());
-							modifications_map.put(attribute_lineno, cell_value);
-							break;
-					}
-					case "Maintenance Type":
-					{
-							//column 15
-							String cell_value = String.valueOf(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 15) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 15) : null)).getValue2());
-							modifications_map.put(attribute_lineno, cell_value);
-							break;
-					}
-					case "Maintenance cost":
-					{
-							//column 16
-							String cell_value = String.valueOf(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 16) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 16) : null)).getValue2());
-							modifications_map.put(attribute_lineno, cell_value);
-							break;
-					}
-					case "PM Maintenance tasks":
-					{
-							//column 17
-							String cell_value = String.valueOf(((Microsoft.Office.Interop.Excel.Range)((range.getCells().getCharacters(rCnt, 17) instanceof Microsoft.Office.Interop.Excel.Range) ? range.getCells().getCharacters(rCnt, 17) : null)).getValue2());
-							modifications_map.put(attribute_lineno, cell_value);
-							break;
-					}
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(10);
+					Object result=cell.getDateCellValue();
+					String cell_value = result.toString();
+					//System.out.println(cell_value);
+					//java.time.LocalDateTime dt = java.time.LocalDateTime.(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Previous Maintenance number": {
+					// column 13
+
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(12);
+					String cell_value = cell.getStringCellValue();
+					//System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Previous Maintenance description": {
+					// column 14
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(13);
+					String cell_value = cell.getStringCellValue();
+					//System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Maintenance Type": {
+					// column 15
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(14);
+					String cell_value = cell.getStringCellValue();
+					//System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Maintenance cost": {
+					// column 16
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(15);
+					Object result= cell.getNumericCellValue();
+					String cell_value = result.toString();
+					//System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "PM Maintenance tasks": {
+					// column 17
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(16);
+					String cell_value = cell.getStringCellValue();
+					//System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+
 				}
 			}
 		}
 
+		FileWriter fw = new FileWriter(new File("D:\\outcome.ifc"));
+		BufferedWriter bw = new BufferedWriter(fw);
+		
+		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
+		BufferedReader br = new BufferedReader(fr);
 
-		java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(new_ifc_file);
+		
 		ArrayList<String> fileLines = new ArrayList<String>();
-		java.io.InputStreamReader reader = new java.io.InputStreamReader(ifc_file);
+		
 		String line = "";
 		boolean isWritten = false;
-		while ((line = reader.ReadLine()) != null)
+		while ((line = br.readLine()) != null)
 		{
 			isWritten = false;
 			for (String attribute_lineno : modifications_map.keySet())
@@ -367,170 +433,29 @@ public class Module1 {
 					///#17174= IFCPROPERTYSINGLEVALUE('PM maintenace Tasks',$,IFCTEXT(''),$);
 					String new_line = line.substring(0, line.indexOf("IFCTEXT('"));
 					new_line = new_line + "IFCTEXT('" + value + "'),$);";
-					writer.write(new_line + System.lineSeparator());
-					writer.flush();
+					bw.write(new_line + System.lineSeparator());
+					bw.flush();
 					isWritten = true;
 				}
 			}
 			if (!isWritten)
 			{
-				writer.write(line + System.lineSeparator());
-				writer.flush();
+				bw.write(line + System.lineSeparator());
+				bw.flush();
 			}
 		}
-		reader.close();
-		writer.close();
-		//MessageBox.Show("Done processing!");
-	}
-=======
-	 * STEP 0: Process BEMS File
-	 * */
-	public void process_bems_file() throws IOException
-	{
-		XSSFRow row;	
-		
-		
-		FileInputStream fis = new FileInputStream(new File("D:\\BEMS.xlsx"));
-		XSSFWorkbook workbook = new XSSFWorkbook(fis);
-		XSSFSheet spreadSheet = workbook.getSheetAt(0);
-		
-		Iterator<Row> rowIterator = spreadSheet.iterator();
-		
-		String newValue = null;
-		
-		while (rowIterator.hasNext()) {
-			
-			row = (XSSFRow) rowIterator.next();			
-			Iterator<Cell> cellIterator = row.cellIterator();			
-			
-			while (cellIterator.hasNext()) {
-				String value = "";				
-				Cell cell = (Cell) cellIterator.next();
-				
-				int columnIndex = cell.getColumnIndex();
-				int rowIndex = cell.getRowIndex();
-				
-				if (columnIndex % 2 != 0) {
-					//System.out.println(cell.getStringCellValue());
-					newValue = cell.getStringCellValue();
-					
-					if (rowIndex == 0) {
-						
-						//System.out.println("Header "+ cell.getStringCellValue());
-						bemsHeader.put(columnIndex, cell.getStringCellValue());
-					}
-					
-					if (newValue != null)
-					{
-						value = newValue;
-					}
-					
-					if (value.toLowerCase().contains("alarm"))
-					{
-						System.out.println("***alarm***");
-						System.out.println(columnIndex);
-						String sb = bemsHeader.get(columnIndex);
-						sb = sb.substring(sb.indexOf(".")+1);
-						System.out.println(sb);
-						objectIDs.add(sb);
-					} 	
-				}
-				
-			}			
-		}
-	}
-
-	private void phase_1() throws IOException
-	{
-		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
-		BufferedReader br = new BufferedReader(fr);
-		
-		String line = "";
-		int hits = 0;
-		
-		
-		
-		while ((line = br.readLine()) != null)
-		{
-			for (String objectid : objectIDs)
-			{
-				if (line.contains("IFCPROPERTYSINGLEVALUE") && line.contains("BEMS ID") && line.contains(objectid)) {
-					
-					System.out.println(line);
-					String lineNo = line.substring(1, line.indexOf("="));
-					objectID_LineNo_Map.put(objectid, lineNo);
-					System.out.println(objectid + "\t" +  lineNo);
-					hits++;
-				}
-			}	
-			
-			if (hits == objectIDs.size())
-			{
-				break;
-			}
-			
-		}
+		bw.close();
 		br.close();
 		//MessageBox.Show("Done processing!");
-		 
-		 
+		 		
 	}
 
-	private void phase_2() throws IOException
-	{
-		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
-		BufferedReader br = new BufferedReader(fr);
-		
-		//java.io.InputStreamReader reader = new java.io.InputStreamReader(ifc_file);
-		String line = "";
-		int hits = 0;
-		while ((line = br.readLine()) != null)
-		{
-			if (!line.contains("'Identity Data'"))
-			{
-				continue;
-			}
-			for (String objectid : objectIDs)
-			{
-				String lineNo = "#" + objectID_LineNo_Map.get(objectid);
-				if (line.contains(lineNo))
-				{
-					//MessageBox.Show(line);
-					System.out.println(line);
-					String identity_LineNo = line.substring(1, line.indexOf("="));
-					objectID_LineNo_Identity_Map.put(objectid, identity_LineNo);
-					// MessageBox.Show(objectid + "\t" +  identity_LineNo);
-					System.out.println(objectid + "\t" +  identity_LineNo);
-					String attributesString = line.replace("));", "");
-					attributesString = attributesString.substring(line.indexOf("(#") + 1);
-					//MessageBox.Show(attributesString);
-					System.out.println(attributesString);
-					
-
-					
-					identity_Line_No_attributes_Map.put(identity_LineNo, new ArrayList<String>(Arrays.asList(attributesString.split(","))));
-					String[] parts = attributesString.split("[,]", -1);
-					for (int i = 0; i < parts.length; i++)
-					{
-						attributes_lineNos.add(parts[i]);
-					}
-					hits++;
-				}
-			}
-			if (hits == objectIDs.size())
-			{
-				break;
-			}
-		}
-		br.close();
-		//MessageBox.Show("Done processing!");
-	}
-
->>>>>>> branch 'ResultsDataAverages' of https://github.com/raghavyadavm/IFC.git
 	public static void main(String a[]) throws IOException{
 		new Module1().process_bems_file();
 		new Module1().phase_1();
 		new Module1().phase_2();
+		new Module1().phase_3();
+		new Module1().phase_4();
+		new Module1().phase_5();
 	}
-}	
-
+}
