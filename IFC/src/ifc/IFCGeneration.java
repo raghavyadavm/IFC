@@ -379,6 +379,7 @@ public class IFCGeneration {
 	public static void main(String[] args) throws  IOException{
 		// TODO Auto-generated method stub1
 		
+		new Module1();
 		new IFCGeneration();
 		//System.out.println("Mapping"+Mapping.linkGeneration());
 		

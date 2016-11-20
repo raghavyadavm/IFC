@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 
 
 
@@ -296,11 +298,156 @@ public class Phase1 {
 	}
 
 
+	private void phase_5() throws IOException
+	{
+		HashMap<String, String> modifications_map = new HashMap<String, String>();
+		
+			
+		
+		
+		FileInputStream fis = new FileInputStream(new File("D:\\CMMS.xlsx"));
+		XSSFWorkbook workbook = new XSSFWorkbook(fis);
+		XSSFSheet spreadSheet = workbook.getSheetAt(0);
+				
+
+		for (String identity_lineno : identity_lineno_row_map.keySet())
+		{
+			int rCnt = identity_lineno_row_map.get(identity_lineno);
+			for (String attribute_lineno : identity_Line_No_attributes_Map.get(identity_lineno))
+			{
+				if (!at_lineno_attribute_map.keySet().contains(attribute_lineno))
+				{
+					continue;
+				}
+				String[] attribute = at_lineno_attribute_map.get(attribute_lineno);
+				switch (attribute[0]) {
+				case "serves": {
+					// column 5
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(4);
+					String cell_value = cell.getStringCellValue();
+					System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "model number": {
+					// column 8
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(7);
+					String cell_value = cell.getStringCellValue();
+					System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Warranty date": {
+					// column 11
+
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(10);
+					Object result=cell.getDateCellValue();
+					String cell_value = result.toString();
+					System.out.println(cell_value);
+					//java.time.LocalDateTime dt = java.time.LocalDateTime.(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Previous Maintenance number": {
+					// column 13
+
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(12);
+					String cell_value = cell.getStringCellValue();
+					System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Previous Maintenance description": {
+					// column 14
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(13);
+					String cell_value = cell.getStringCellValue();
+					System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Maintenance Type": {
+					// column 15
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(14);
+					String cell_value = cell.getStringCellValue();
+					System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "Maintenance cost": {
+					// column 16
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(15);
+					Object result= cell.getNumericCellValue();
+					String cell_value = result.toString();
+					System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+				case "PM Maintenance tasks": {
+					// column 17
+					Row row = spreadSheet.getRow(rCnt);
+					Cell cell = row.getCell(16);
+					String cell_value = cell.getStringCellValue();
+					System.out.println(cell_value);
+					modifications_map.put(attribute_lineno, cell_value);
+					break;
+				}
+
+				}
+			}
+		}
+
+		FileWriter fw = new FileWriter(new File("D:\\outcome.ifc"));
+		BufferedWriter bw = new BufferedWriter(fw);
+		
+		FileReader fr = new FileReader(new File("D:\\IFCOriginal.ifc"));
+		BufferedReader br = new BufferedReader(fr);
+
+		//java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(new_ifc_file);
+		ArrayList<String> fileLines = new ArrayList<String>();
+		//java.io.InputStreamReader reader = new java.io.InputStreamReader(ifc_file);
+		String line = "";
+		boolean isWritten = false;
+		while ((line = br.readLine()) != null)
+		{
+			isWritten = false;
+			for (String attribute_lineno : modifications_map.keySet())
+			{
+				if (line.startsWith(attribute_lineno + "="))
+				{
+					String value = modifications_map.get(attribute_lineno);
+					///#17174= IFCPROPERTYSINGLEVALUE('PM maintenace Tasks',$,IFCTEXT(''),$);
+					String new_line = line.substring(0, line.indexOf("IFCTEXT('"));
+					new_line = new_line + "IFCTEXT('" + value + "'),$);";
+					bw.write(new_line + System.lineSeparator());
+					bw.flush();
+					isWritten = true;
+				}
+			}
+			if (!isWritten)
+			{
+				bw.write(line + System.lineSeparator());
+				bw.flush();
+			}
+		}
+		bw.close();
+		br.close();
+		//MessageBox.Show("Done processing!");
+		 		
+	}
+
 	public static void main(String a[]) throws IOException{
 		new Phase1().process_bems_file();
 		new Phase1().phase_1();
 		new Phase1().phase_2();
 		new Phase1().phase_3();
 		new Phase1().phase_4();
+		new Phase1().phase_5();
 	}
 }
