@@ -49,9 +49,9 @@ public class IFCGeneration {
 	//int cc = getCount();
 	//System.out.println(cc);
 		
-		//printExcel();
+		printExcel();
 		
-		Mapping.linkGeneration();
+		//Mapping.linkGeneration();
 		
 		
 	
@@ -68,43 +68,189 @@ public class IFCGeneration {
 		int cellCount = 0;
 		int counter = getCount();
 		
+		double average1 = 0;
+		int countAverage1 = 0;
+		
+		double average2 = 0;
+		int countAverage2 = 0;
+		
+		double average3 = 0;
+		int countAverage3 = 0;
+		
+		double computed1 = 0;
+		double computed2 = 0;
+		double computed3 = 0;
+		
+		HashMap computed = new HashMap();
+		
+		
+		
+		
 		for (int i = 1; i <workbook.getNumberOfSheets(); i++) {
 			
 			XSSFSheet spreadSheet = workbook.getSheetAt(i);
 			Iterator<Row> rowIterator = spreadSheet.iterator();
 			String zone = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone',$,IFCTEXT('"+spreadSheet.getSheetName()+"'),$);";
-			
-			//System.out.println(zone);
+			cellCount = cellCount+1;
+			System.out.println(zone);
 			bwg.write(zone);
 			bwg.newLine();
+			//workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue();
 			
-			if (rowIterator.hasNext()) {
+			while (rowIterator.hasNext()) {
 				
 				row = (XSSFRow) rowIterator.next();
-				cellCount= row.getLastCellNum();
+				//cellCount= 10; // No of single values
 				Iterator<Cell> cellIterator = row.cellIterator();
+				
 				while (cellIterator.hasNext()) {
 					
 					Cell cell = (Cell) cellIterator.next();
-					//System.out.println(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex()));
-					//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('"+(workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue()+"'),$);");
-					String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('"+cell.toString()+"',$,IFCTEXT('0'),$);";
-					bwg.write(msg);
-					bwg.newLine();
+					int columnIndex = cell.getColumnIndex();
+					int rowIndex = cell.getRowIndex();
+					
+					
+					if(columnIndex ==0){
+						if((rowIndex-2) % 24 ==0){
+							String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Date',$,IFCTEXT('"+cell.getDateCellValue()+"'),$);";
+							System.out.println(msg);
+							bwg.write(msg);
+							bwg.newLine();
+						}
+						
+					}
+					
+					if(columnIndex ==2 && rowIndex >1 ){
+						
+						if(countAverage1++<24){
+							//System.out.println("value"+cell.getNumericCellValue());
+							average1 =average1+cell.getNumericCellValue();
+							
+							//System.out.println("count1 "+countAverage1);
+							//countAverage1++;
+							if(countAverage1 == 24){
+								computed1 = average1/24;
+								//computed.put(computed1,"zone a");
+								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone Heating A',$,IFCTEXT('"+average1/24+"'),$);";
+								System.out.println(msg);
+								bwg.write(msg);
+								bwg.newLine();
+								average1=0;
+								countAverage1=0;
+							}
+						}
+						//System.out.println("value1 "+row.getCell(columnIndex).getRawValue());
+						
+						//System.out.println("Average2 "+average1);
+						
+					}
+					
+					if(columnIndex ==14 && rowIndex >1 ){
+						
+						if(countAverage2++<24){
+							//System.out.println("value"+cell.getNumericCellValue());
+							average2 =average2+cell.getNumericCellValue();
+							
+							//System.out.println("count1 "+countAverage2);
+							//countAverage1++;
+							if(countAverage2 == 24){								
+								computed2 = average2/24;
+								//computed.put(computed2,"zone b");
+								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone Heating B',$,IFCTEXT('"+average2/24+"'),$);";
+								//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone Heating B',$,IFCTEXT('"+average2/24+"'),$);");
+								System.out.println(msg);
+								bwg.write(msg);
+								bwg.newLine();
+								average2=0;
+								countAverage2=0;
+							}
+						}
+						//System.out.println("value2 "+row.getCell(columnIndex).getRawValue());
+						
+						//System.out.println("Average2 "+average2);
+						
+					}
+					
+					if(columnIndex ==24 && rowIndex >1 ){
+						
+						if(countAverage3++<24){
+							//System.out.println("value"+cell.getNumericCellValue());
+							average3 =average3+cell.getNumericCellValue();
+							
+							//System.out.println("count1 "+countAverage1);
+							//countAverage1++;
+							if(countAverage3 == 24){								
+								computed3 = average3/24;
+								cellCount = cellCount + 6; // cell count of each 24 range generated single values
+								//computed.put(computed3,"analytical");
+								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Actual heating vavle',$,IFCTEXT('"+average3/24+"'),$);";
+								System.out.println(msg);
+								bwg.write(msg);
+								bwg.newLine();
+								
+								msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference A',$,IFCTEXT('"+(computed1 - computed3)+"'),$);";
+								//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Actual heating vavle',$,IFCTEXT('"+average3/24+"'),$);");
+								System.out.println(msg);
+								bwg.write(msg);
+								bwg.newLine();
+								
+								msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference B',$,IFCTEXT('"+(computed2 - computed3)+"'),$);";
+								//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Actual heating vavle',$,IFCTEXT('"+average3/24+"'),$);");
+								System.out.println(msg);
+								bwg.write(msg);
+								bwg.newLine();
+								
+								//****************************Setting the Flags**************************************
+								if((computed1 - computed3)<0){
+									cellCount = cellCount + 1;
+									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag 1',$,IFCTEXT('true'),$);";
+									System.out.println(msg);
+									bwg.write(msg);
+									bwg.newLine();
+								}
+								if((computed2 - computed3)<0){
+									cellCount = cellCount + 1;
+									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag 2',$,IFCTEXT('true'),$);";
+									System.out.println(msg);
+									bwg.write(msg);
+									bwg.newLine();
+								}
+								
+								//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference A',$,IFCTEXT('"+(computed1 - computed3)+"'),$);");
+								//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference B',$,IFCTEXT('"+(computed2 - computed3)+"'),$);");
+								//System.out.println("computed1 "+computed1+" computed2 "+computed2+" computed3 "+computed3);
+								average3=0;
+								countAverage3=0;
+							}
+						}
+						//System.out.println("value3 "+row.getCell(columnIndex).getRawValue());
+						
+						//System.out.println("Average3 "+average3);
+						
+					}
+					
+					
 				}
+				
+				
 				
 			}
 			linkMap = Mapping.linkGeneration();
 			
-			//int setCounter = ++counter;
+			
+			
+			System.out.println("cellCount "+ cellCount);
+			
+			//******************************************IFCPropertySET***************
 			
 			String set = "#"+(++counter)+"= IFCPROPERTYSET('',#Value,'Analytical Data',$,(";
 			analyticalMap.put( "#"+counter,spreadSheet.getSheetName());
-			for (int j = counter-cellCount-1; j < counter-1; ++j) {
+			for (int j = counter-cellCount; j < counter-1; ++j) {
 				set = set+"#"+j+"," ;
 			}
 			set = set+"#"+(counter-1)+"));";
-			//System.out.println(set);
+			System.out.println(set);
+			cellCount=0;
 			
 			bwg.write(set);
 			bwg.newLine();
@@ -133,7 +279,7 @@ public class IFCGeneration {
 		}
 
 		
-		//linking();
+		
 		bwg.write("ENDSEC;");
 		bwg.newLine();
 		bwg.write("END-ISO-10303-21;");
