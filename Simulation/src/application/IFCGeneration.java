@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -40,6 +41,8 @@ public class IFCGeneration {
 	@SuppressWarnings("rawtypes")
 	public static HashMap linkMap;
 	public static HashMap analyticalLinkMap;
+	public static HashMap flagsMap;
+
 	FileWriter fwg = new FileWriter(new File("D:\\interm.ifc"));
 	BufferedWriter bwg = new BufferedWriter(fwg);
 	
@@ -64,6 +67,7 @@ public class IFCGeneration {
 		XSSFWorkbook workbook = new XSSFWorkbook(fis);
 		
 		HashMap analyticalMap = new HashMap();
+		flagsMap = new HashMap();
 		int cellCount = 0;
 		int counter = getCount();
 		
@@ -81,7 +85,7 @@ public class IFCGeneration {
 		double computed3 = 0;
 		
 		HashMap computed = new HashMap();
-		
+		int flagCount = 0;
 		
 		
 		
@@ -94,6 +98,7 @@ public class IFCGeneration {
 			System.out.println(zone);
 			bwg.write(zone);
 			bwg.newLine();
+			flagCount = 0;
 			//workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue();
 			
 			while (rowIterator.hasNext()) {
@@ -108,8 +113,10 @@ public class IFCGeneration {
 					int columnIndex = cell.getColumnIndex();
 					int rowIndex = cell.getRowIndex();
 					
+					int type;				    
+				    type = cell.getCellType();
 					
-					if(columnIndex ==0){
+					if(columnIndex ==0 && type == 0 ){
 						if((rowIndex-2) % 24 ==0){
 							String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Date',$,IFCTEXT('"+cell.getDateCellValue()+"'),$);";
 							System.out.println(msg);
@@ -119,7 +126,7 @@ public class IFCGeneration {
 						
 					}
 					
-					if(columnIndex ==2 && rowIndex >1 ){
+					if(columnIndex ==2 && rowIndex >1  && type == 0){
 						
 						if(countAverage1++<24){
 							//System.out.println("value"+cell.getNumericCellValue());
@@ -144,7 +151,7 @@ public class IFCGeneration {
 						
 					}
 					
-					if(columnIndex ==14 && rowIndex >1 ){
+					if(columnIndex ==14 && rowIndex >1  && type == 0){
 						
 						if(countAverage2++<24){
 							//System.out.println("value"+cell.getNumericCellValue());
@@ -170,7 +177,7 @@ public class IFCGeneration {
 						
 					}
 					
-					if(columnIndex ==24 && rowIndex >1 ){
+					if(columnIndex ==24 && rowIndex >1  && type == 0){
 						
 						if(countAverage3++<24){
 							//System.out.println("value"+cell.getNumericCellValue());
@@ -201,6 +208,7 @@ public class IFCGeneration {
 								
 								//****************************Setting the Flags**************************************
 								if((computed1 - computed3)<0){
+									flagCount++;
 									cellCount = cellCount + 1;
 									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag 1',$,IFCTEXT('true'),$);";
 									System.out.println(msg);
@@ -208,6 +216,7 @@ public class IFCGeneration {
 									bwg.newLine();
 								}
 								if((computed2 - computed3)<0){
+									flagCount++;
 									cellCount = cellCount + 1;
 									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag 2',$,IFCTEXT('true'),$);";
 									System.out.println(msg);
@@ -253,6 +262,8 @@ public class IFCGeneration {
 			
 			bwg.write(set);
 			bwg.newLine();
+			System.out.println("sheet" + spreadSheet.getSheetName()+"count "+flagCount);
+			flagsMap.put(spreadSheet.getSheetName(),flagCount);
 		}	
 		
 		Set<String> analyticalMapSet = analyticalMap.keySet();
@@ -277,7 +288,7 @@ public class IFCGeneration {
 			System.out.println(str1 + ":" + analyticalLinkMap.get(str1) + ", ");
 		}
 
-		
+		System.out.println("\nFlags Map"+flagsMap);
 		
 		bwg.write("ENDSEC;");
 		bwg.newLine();

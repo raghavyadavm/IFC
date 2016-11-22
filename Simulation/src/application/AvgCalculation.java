@@ -65,10 +65,18 @@ public class AvgCalculation {
 					int columnIndex = cell.getColumnIndex();
 					int rowIndex = cell.getRowIndex();
 					
-					if(columnIndex ==2 && rowIndex >1 ){
+				
+					int type;
+				    
+				    type = cell.getCellType();
+
+				    Object result;
+					
+					if(columnIndex ==2 && rowIndex >1 && type == 0){
 						
 						if(countAverage1++<24){
 							//System.out.println("value"+cell.getNumericCellValue());
+							
 							average1 =average1+cell.getNumericCellValue();
 							
 							//System.out.println("count1 "+countAverage1);
@@ -87,7 +95,7 @@ public class AvgCalculation {
 						
 					}
 					
-					if(columnIndex ==14 && rowIndex >1 ){
+					if(columnIndex ==14 && rowIndex >1  && type == 0){
 						
 						if(countAverage2++<24){
 							//System.out.println("value"+cell.getNumericCellValue());
@@ -109,7 +117,7 @@ public class AvgCalculation {
 						
 					}
 					
-					if(columnIndex ==24 && rowIndex >1 ){
+					if(columnIndex ==24 && rowIndex >1  && type == 0){
 						
 						if(countAverage3++<24){
 							//System.out.println("value"+cell.getNumericCellValue());

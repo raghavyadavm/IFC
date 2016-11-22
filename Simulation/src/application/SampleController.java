@@ -3,6 +3,7 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,6 +37,7 @@ public class SampleController {
 	@SuppressWarnings("rawtypes")
 	@FXML ListView alarmsList;
 	@FXML ProgressBar progressBar;
+	@FXML ListView flagList;
 
 	public void bemsButtonAction(ActionEvent event) {
 
@@ -109,6 +111,16 @@ public class SampleController {
 		}
 		progressBar.setProgress(0.25F);
 		new IFCGeneration();
+		Set<String> flagSet = IFCGeneration.flagsMap.keySet();
+		System.out.println("\nanalyticalMap");
+		for (String str1 : flagSet) {
+			System.out.println(str1 + ":" + IFCGeneration.flagsMap.get(str1) + ", ");
+			int test = (int) IFCGeneration.flagsMap.get(str1);
+			if (test > 0) {
+				flagList.getItems().add(str1 + "   :   " + IFCGeneration.flagsMap.get(str1));
+			}			
+		}
+			
 		progressBar.setProgress(1F);
 		
 		
