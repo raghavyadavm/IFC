@@ -15,7 +15,7 @@ public class Mapping {
 	@SuppressWarnings("rawtypes")
 	public static HashMap linkGeneration() throws IOException{
 		
-		FileReader fr = new FileReader(new File("D:\\outcome.ifc"));
+		FileReader fr = new FileReader(new File("interm.ifc"));
 		BufferedReader br = new BufferedReader(fr);
 
 		HashMap associatesMaterialMap = new HashMap();
