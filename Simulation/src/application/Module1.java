@@ -411,7 +411,7 @@ public class Module1 {
 			}
 		}
 
-		FileWriter fw = new FileWriter(new File("D:\\outcome.ifc"));
+		FileWriter fw = new FileWriter(new File("interm.ifc"));
 		BufferedWriter bw = new BufferedWriter(fw);
 		
 		FileReader fr = new FileReader(new File(SampleController.ifc));
@@ -450,12 +450,12 @@ public class Module1 {
 		 		
 	}
 
-	public static void main(String a[]) throws IOException{
+	/*public static void main(String a[]) throws IOException{
 		new Module1().process_bems_file();
 		new Module1().phase_1();
 		new Module1().phase_2();
 		new Module1().phase_3();
 		new Module1().phase_4();
 		new Module1().phase_5();
-	}
+	}*/
 }

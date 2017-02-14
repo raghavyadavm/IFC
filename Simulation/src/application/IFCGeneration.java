@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -43,14 +44,14 @@ public class IFCGeneration {
 	public static HashMap analyticalLinkMap;
 	public static HashMap flagsMap;
 
-	FileWriter fwg = new FileWriter(new File("D:\\interm.ifc"));
+	FileWriter fwg = new FileWriter(new File("interm.ifc"));
 	BufferedWriter bwg = new BufferedWriter(fwg);
 	
 	public IFCGeneration() throws IOException {
 		// TODO Auto-generated constructor stub
 	//int cc = getCount();
 	//System.out.println(cc);
-		
+		new Module1();
 		printExcel();
 		
 		//Mapping.linkGeneration();
@@ -59,6 +60,7 @@ public class IFCGeneration {
 	
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void printExcel() throws IOException{
 		XSSFRow row;
 		
@@ -99,6 +101,7 @@ public class IFCGeneration {
 			bwg.write(zone);
 			bwg.newLine();
 			flagCount = 0;
+			String date = null;
 			//workbook.getSheetAt(i).getRow(1).getCell(cell.getColumnIndex())).getRawValue();
 			
 			while (rowIterator.hasNext()) {
@@ -106,6 +109,7 @@ public class IFCGeneration {
 				row = (XSSFRow) rowIterator.next();
 				//cellCount= 10; // No of single values
 				Iterator<Cell> cellIterator = row.cellIterator();
+				
 				
 				while (cellIterator.hasNext()) {
 					
@@ -115,9 +119,11 @@ public class IFCGeneration {
 					
 					int type;				    
 				    type = cell.getCellType();
+				   
 					
 					if(columnIndex ==0 && type == 0 ){
-						if((rowIndex-2) % 24 ==0){
+						if((rowIndex-2) % 24 ==0){	
+							date = (cell.getDateCellValue()).toGMTString();
 							String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Date',$,IFCTEXT('"+cell.getDateCellValue()+"'),$);";
 							System.out.println(msg);
 							bwg.write(msg);
@@ -137,7 +143,7 @@ public class IFCGeneration {
 							if(countAverage1 == 24){
 								computed1 = average1/24;
 								//computed.put(computed1,"zone a");
-								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone Heating A',$,IFCTEXT('"+average1/24+"'),$);";
+								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone Heating A ',$,IFCTEXT('"+average1/24+"'),$);";
 								System.out.println(msg);
 								bwg.write(msg);
 								bwg.newLine();
@@ -189,18 +195,18 @@ public class IFCGeneration {
 								computed3 = average3/24;
 								cellCount = cellCount + 6; // cell count of each 24 range generated single values
 								//computed.put(computed3,"analytical");
-								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Actual heating vavle',$,IFCTEXT('"+average3/24+"'),$);";
+								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Actual heating value',$,IFCTEXT('"+average3/24+"'),$);";
 								System.out.println(msg);
 								bwg.write(msg);
 								bwg.newLine();
 								
-								msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference A',$,IFCTEXT('"+(computed1 - computed3)+"'),$);";
+								msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference A "+date+"',$,IFCTEXT('"+(computed1 - computed3)+"'),$);";
 								//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Actual heating vavle',$,IFCTEXT('"+average3/24+"'),$);");
 								System.out.println(msg);
 								bwg.write(msg);
 								bwg.newLine();
 								
-								msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference B',$,IFCTEXT('"+(computed2 - computed3)+"'),$);";
+								msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Difference B "+date+"',$,IFCTEXT('"+(computed2 - computed3)+"'),$);";
 								//System.out.println("#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Actual heating vavle',$,IFCTEXT('"+average3/24+"'),$);");
 								System.out.println(msg);
 								bwg.write(msg);
@@ -303,7 +309,7 @@ public class IFCGeneration {
 	
 	
 	public  int getCount() throws IOException{
-		FileReader fr = new FileReader(new File("D:\\outcome.ifc"));
+		FileReader fr = new FileReader(new File("interm.ifc"));
 		BufferedReader br = new BufferedReader(fr);
 		
 	//	FileWriter fw = new FileWriter(new File("D:\\result1.ifc"));
@@ -340,10 +346,10 @@ public class IFCGeneration {
 
 
 	public void linking() throws IOException{
-		FileReader frl = new FileReader(new File("D:\\interm.ifc"));
+		FileReader frl = new FileReader(new File("interm.ifc"));
 		BufferedReader brl = new BufferedReader(frl);
 		
-		FileWriter fwg = new FileWriter(new File("D:\\generated.ifc"));
+		FileWriter fwg = new FileWriter(new File("generated.ifc"));
 		BufferedWriter bwg = new BufferedWriter(fwg);
 		
 		
@@ -386,13 +392,13 @@ public class IFCGeneration {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws  IOException{
+	/*public static void main(String[] args) throws  IOException{
 		// TODO Auto-generated method stub1
 		
 		new Module1();
 		new IFCGeneration();
 		//System.out.println("Mapping"+Mapping.linkGeneration());
 		
-	}
+	}*/
 
 }
