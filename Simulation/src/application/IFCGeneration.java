@@ -123,7 +123,7 @@ public class IFCGeneration {
 					
 					if(columnIndex ==0 && type == 0 ){
 						if((rowIndex-2) % 24 ==0){	
-							date = (cell.getDateCellValue()).toGMTString();
+							date = (cell.getDateCellValue()).toString();
 							String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Date',$,IFCTEXT('"+cell.getDateCellValue()+"'),$);";
 							System.out.println(msg);
 							bwg.write(msg);
@@ -143,7 +143,7 @@ public class IFCGeneration {
 							if(countAverage1 == 24){
 								computed1 = average1/24;
 								//computed.put(computed1,"zone a");
-								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone Heating A ',$,IFCTEXT('"+average1/24+"'),$);";
+								String msg = "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Zone Heating A',$,IFCTEXT('"+average1/24+"'),$);";
 								System.out.println(msg);
 								bwg.write(msg);
 								bwg.newLine();
@@ -216,7 +216,7 @@ public class IFCGeneration {
 								if((computed1 - computed3)<0){
 									flagCount++;
 									cellCount = cellCount + 1;
-									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag 1',$,IFCTEXT('true'),$);";
+									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag A  "+date+"',$,IFCTEXT('true'),$);";
 									System.out.println(msg);
 									bwg.write(msg);
 									bwg.newLine();
@@ -224,7 +224,7 @@ public class IFCGeneration {
 								if((computed2 - computed3)<0){
 									flagCount++;
 									cellCount = cellCount + 1;
-									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag 2',$,IFCTEXT('true'),$);";
+									msg= "#"+(++counter)+"= IFCPROPERTYSINGLEVALUE('Flag B  "+date+"',$,IFCTEXT('true'),$);";
 									System.out.println(msg);
 									bwg.write(msg);
 									bwg.newLine();
