@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="927.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SampleController">
+   <children>
+      <Button fx:id="BEMSButton" layoutX="440.0" layoutY="39.0" mnemonicParsing="false" onAction="#bemsButtonAction" prefHeight="39.0" prefWidth="130.0" text="Browse" />
+      <Button fx:id="CMMSButton" layoutX="440.0" layoutY="93.0" mnemonicParsing="false" onAction="#cmmsButtonAction" prefHeight="39.0" prefWidth="130.0" text="Browse" />
+      <Button fx:id="ResultsButton" layoutX="440.0" layoutY="155.0" mnemonicParsing="false" onAction="#resultsButtonAction" prefHeight="39.0" prefWidth="130.0" text="Browse" />
+      <Button fx:id="IFCButton" layoutX="440.0" layoutY="212.0" mnemonicParsing="false" onAction="#ifcButtonAction" prefHeight="39.0" prefWidth="130.0" text="Browse" />
+      <TextField fx:id="bemsTF" layoutX="98.0" layoutY="39.0" prefHeight="39.0" prefWidth="299.0" />
+      <TextField fx:id="cmmsTF" layoutX="98.0" layoutY="93.0" prefHeight="39.0" prefWidth="299.0" />
+      <TextField fx:id="resultsTF" layoutX="98.0" layoutY="155.0" prefHeight="39.0" prefWidth="299.0" />
+      <TextField fx:id="ifcTF" layoutX="98.0" layoutY="212.0" prefHeight="39.0" prefWidth="299.0" />
+      <Label layoutX="17.0" layoutY="38.0" prefHeight="27.0" prefWidth="81.0" text="BEMS" />
+      <Label layoutX="18.0" layoutY="99.0" prefHeight="27.0" prefWidth="62.0" text="CMMS" />
+      <Label layoutX="15.0" layoutY="161.0" prefHeight="27.0" prefWidth="68.0" text="Simulation" />
+      <Label layoutX="23.0" layoutY="218.0" prefHeight="27.0" prefWidth="53.0" text="IFC" />
+      <Button fx:id="processButton" layoutX="182.0" layoutY="275.0" mnemonicParsing="false" onAction="#processButtonAction" prefHeight="39.0" prefWidth="147.0" text="Process" />
+      <ListView fx:id="alarmsList" layoutX="602.0" layoutY="59.0" prefHeight="193.0" prefWidth="140.0" />
+      <Label layoutX="625.0" layoutY="26.0" prefHeight="27.0" prefWidth="124.0" text="Alarm Zones" />
+      <ProgressBar fx:id="progressBar" layoutX="397.0" layoutY="281.0" prefWidth="200.0" progress="0.0" />
+      <ListView fx:id="flagList" layoutX="756.0" layoutY="59.0" prefHeight="193.0" prefWidth="147.0" />
+      <Label layoutX="786.0" layoutY="26.0" text="Flag Zones" />
+   </children>
+</AnchorPane>
